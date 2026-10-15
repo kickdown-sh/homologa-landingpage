@@ -53,7 +53,7 @@ export default function Demonstracao({ id }: SectionProps) {
           <button
             className="fable-button fable-button--ghost"
             type="button"
-            onClick={() => window.__fable?.scrollTo(1)}
+            onClick={() => window.__fable?.scrollTo(2)}
           >
             Ver os documentos gerados
           </button>

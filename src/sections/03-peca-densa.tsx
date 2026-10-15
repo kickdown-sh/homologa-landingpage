@@ -20,7 +20,7 @@ const validationItems = [
   { state: 'Conforme', reference: 'NBR 16690', text: 'Item conferido pela regra aplicável ao documento.' },
 ] as const;
 
-export default function PecaDensa({ label }: SectionProps) {
+export default function PecaDensa({ id }: SectionProps) {
   const telemetry = useMockTelemetry();
   const [activeDocument, setActiveDocument] = useState(0);
   const selected = documents[activeDocument];
@@ -113,7 +113,7 @@ export default function PecaDensa({ label }: SectionProps) {
         <div>
           <LineReveal
             as="h2"
-            section="02"
+            section={id}
             className="fable-heading peca-densa__heading"
             lines={['O pacote que você', 'montava à mão.']}
           />

@@ -2,7 +2,7 @@ import type { CSSProperties } from 'react';
 import type { SectionProps } from '../contrato/types';
 import { LineReveal } from '../contrato/reveal';
 
-export default function Virada({ label }: SectionProps) {
+export default function Virada({ id }: SectionProps) {
   const ruleStyle: CSSProperties = {
     borderColor: 'color-mix(in srgb, var(--fable-void) 32%, transparent)',
   };
@@ -11,7 +11,7 @@ export default function Virada({ label }: SectionProps) {
     <div className="fable-container" style={{ display: 'grid', gap: 'clamp(2rem, 4vh, 4rem)' }}>
       <LineReveal
         as="h2"
-        section="04"
+        section={id}
         className="fable-display"
         lines={[
           'Organizar o processo',
@@ -23,7 +23,7 @@ export default function Virada({ label }: SectionProps) {
         <div style={{ display: 'grid', gap: '1.25rem', maxWidth: '38rem' }}>
           <LineReveal
             as="p"
-            section="04"
+            section={id}
             className="fable-copy"
             lines={[
               'Planilha e painel de gestão mostram onde cada projeto está. Não impedem que ele volte da distribuidora.',
