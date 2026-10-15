@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type KeyboardEvent, type TouchEvent } from
 import { Play } from 'lucide-react';
 import { LineReveal } from '../contrato/reveal';
 import type { SectionProps } from '../contrato/types';
+import { buildWhatsAppLink } from '../utils/whatsapp';
 
 // Apresentação do produto (VSL) em public/vsl.mp4: 2 min 47 s, 1080p, com som.
 // Nada é baixado antes do clique (preload none); na carga da página só entra o pôster.
@@ -9,11 +10,18 @@ const DURACAO = '2:47';
 const DURACAO_POR_EXTENSO = '2 minutos e 47 segundos';
 // Teclas do player nativo que a rolagem guiada da landing também captura na janela.
 const TECLAS_DO_PLAYER = new Set([' ', 'Enter', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'PageUp', 'PageDown', 'Home', 'End']);
+// A mensagem diz de onde o contato veio: separa no WhatsApp quem pediu depois do vídeo.
+const demoLink = buildWhatsAppLink('Olá! Vi a apresentação e quero agendar uma demonstração do Homologa Plus.');
+// Marcos de progresso enviados ao Pixel (uma vez cada): dizem se o vídeo segura atenção.
+const MARCOS = [25, 50, 75, 100] as const;
 
 export default function Vsl({ id }: SectionProps) {
   const figureRef = useRef<HTMLElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const tocouUmaVez = useRef(false);
+  const marcosEnviados = useRef(new Set<number>());
   const [iniciado, setIniciado] = useState(false);
+  const [terminou, setTerminou] = useState(false);
 
   // A rolagem guiada troca de seção num passo e as seções se sobrepõem um pouco: com menos
   // da metade do player na tela, o vídeo pausa e não retoma sozinho.
@@ -33,6 +41,32 @@ export default function Vsl({ id }: SectionProps) {
     if (!video) return;
     setIniciado(true);
     void video.play().catch(() => undefined);
+  };
+
+  // Pixel só existe com consentimento de marketing (src/lib/consent.ts); sem ele, nada sai.
+  const registrarPlay = () => {
+    if (tocouUmaVez.current) return;
+    tocouUmaVez.current = true;
+    window.fbq?.('trackCustom', 'VSLPlay');
+  };
+
+  const registrarMarco = (marco: number) => {
+    if (marcosEnviados.current.has(marco)) return;
+    marcosEnviados.current.add(marco);
+    window.fbq?.('trackCustom', 'VSLProgress', { percent: marco });
+  };
+
+  const registrarProgresso = (video: HTMLVideoElement) => {
+    if (!video.duration) return;
+    const percentual = (video.currentTime / video.duration) * 100;
+    MARCOS.forEach((marco) => {
+      if (percentual >= marco) registrarMarco(marco);
+    });
+  };
+
+  const aoTerminar = () => {
+    registrarMarco(100);
+    setTerminou(true);
   };
 
   const protegerTecla = (event: KeyboardEvent<HTMLElement>) => {
@@ -58,7 +92,7 @@ export default function Vsl({ id }: SectionProps) {
           --vsl-radius: .875rem;
           position: relative;
           z-index: 8;
-          width: min(100%, 72rem, max(40rem, calc((100vh - 27rem) * 16 / 9)));
+          width: min(100%, 72rem, max(40rem, calc((100vh - 28.5rem) * 16 / 9)));
           margin: 0 auto;
           border: 1px solid color-mix(in srgb, var(--fable-paper) 14%, transparent);
           border-radius: var(--vsl-radius);
@@ -81,9 +115,14 @@ export default function Vsl({ id }: SectionProps) {
         .vsl__chip-icon svg { margin-left: .1rem; }
         .vsl__chip-time { color: color-mix(in srgb, var(--fable-void) 62%, transparent); font-family: "Cascadia Code", "JetBrains Mono", ui-monospace, monospace; font-size: var(--fable-label); font-weight: 600; letter-spacing: .08em; }
 
-        .vsl__caption { display: flex; justify-content: space-between; align-items: baseline; gap: .5rem 1rem; margin: 0; padding: .85rem 1.1rem; border-top: 1px solid color-mix(in srgb, var(--fable-paper) 10%, transparent); }
-        .vsl__caption-title { min-width: 0; color: var(--fable-paper); font-size: .9375rem; font-weight: 450; line-height: 1.35; }
-        .vsl__caption-meta { flex: 0 0 auto; color: var(--fable-muted); font-family: "Cascadia Code", "JetBrains Mono", ui-monospace, monospace; font-size: var(--fable-label); letter-spacing: .08em; text-transform: uppercase; }
+        /* Chamada fixa sob o player: o vídeo termina pedindo a demonstração, o botão já está ali. */
+        .vsl__caption { display: flex; justify-content: space-between; align-items: center; gap: .75rem 1.25rem; margin: 0; padding: .75rem .75rem .75rem 1.1rem; border-top: 1px solid color-mix(in srgb, var(--fable-paper) 10%, transparent); }
+        .vsl__caption-text { display: grid; gap: .2rem; min-width: 0; }
+        .vsl__caption-title { color: var(--fable-paper); font-size: .9375rem; font-weight: 450; line-height: 1.35; }
+        .vsl__caption-meta { color: var(--fable-muted); font-family: "Cascadia Code", "JetBrains Mono", ui-monospace, monospace; font-size: var(--fable-label); letter-spacing: .08em; text-transform: uppercase; }
+        .vsl__cta { flex: 0 0 auto; min-height: 2.75rem; padding-inline: 1.25rem; font-size: .8125rem; }
+        .vsl__cta:focus-visible { outline: 2px solid var(--fable-accent); outline-offset: .25rem; }
+        .vsl__cta[data-destaque="true"] { background: var(--fable-accent); }
         .vsl__sr { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; border: 0; }
 
         @media (max-width: 56rem) {
@@ -93,8 +132,9 @@ export default function Vsl({ id }: SectionProps) {
         @media (max-width: 42rem) {
           .vsl__heading { max-width: 11ch; font-size: clamp(2.2rem, 11vw, 3.1rem); }
           .vsl__player { --vsl-radius: .75rem; }
-          .vsl__caption { padding: .75rem .9rem; }
+          .vsl__caption { flex-wrap: wrap; padding: .75rem .9rem; }
           .vsl__caption-title { font-size: .875rem; }
+          .vsl__cta { width: 100%; }
         }
         @media (prefers-reduced-motion: reduce) {
           .vsl__chip { transition: none; }
@@ -132,6 +172,9 @@ export default function Vsl({ id }: SectionProps) {
             height={1080}
             poster="/vsl-poster.jpg"
             onKeyDown={protegerTecla}
+            onPlay={registrarPlay}
+            onTimeUpdate={(event) => registrarProgresso(event.currentTarget)}
+            onEnded={aoTerminar}
           >
             <source src="/vsl.mp4" type="video/mp4" />
           </video>
@@ -147,8 +190,20 @@ export default function Vsl({ id }: SectionProps) {
           )}
         </div>
         <figcaption className="vsl__caption">
-          <span className="vsl__caption-title">Apresentação do Homologa Plus</span>
-          <span className="vsl__caption-meta">{DURACAO} · com som</span>
+          <span className="vsl__caption-text">
+            <span className="vsl__caption-title">Apresentação do Homologa Plus</span>
+            <span className="vsl__caption-meta">{DURACAO} · com som</span>
+          </span>
+          <a
+            className="fable-button vsl__cta"
+            href={demoLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            data-destaque={terminou}
+            onClick={() => window.fbq?.('track', 'Contact')}
+          >
+            Agendar demonstração
+          </a>
         </figcaption>
       </figure>
     </div>
