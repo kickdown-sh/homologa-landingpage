@@ -40,9 +40,9 @@ export default function LandingPage() {
           <span>Homologa <span>Plus</span></span>
         </button>
         <nav className="fable-nav-links" aria-label="Navegação principal">
-          <button className="fable-nav-button" type="button" onClick={() => goTo(1)}>Automação</button>
-          <button className="fable-nav-button" type="button" onClick={() => goTo(2)}>Como funciona</button>
-          <button className="fable-nav-button" type="button" onClick={() => goTo(4)}>Planos</button>
+          <button className="fable-nav-button" type="button" onClick={() => goTo(2)}>Automação</button>
+          <button className="fable-nav-button" type="button" onClick={() => goTo(3)}>Como funciona</button>
+          <button className="fable-nav-button" type="button" onClick={() => goTo(5)}>Planos</button>
           <a
             className="fable-nav-button fable-nav-button--cta"
             href={DEMO_LINK}

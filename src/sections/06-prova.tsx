@@ -40,7 +40,7 @@ const trackPlan = (plan: Plan) => {
   }
 };
 
-export default function Prova({ label }: SectionProps) {
+export default function Prova({ id }: SectionProps) {
   return (
     <section className="proof" aria-label="Planos Homologa Plus">
       <style>{`
@@ -114,14 +114,14 @@ export default function Prova({ label }: SectionProps) {
           <LineReveal
             as="h2"
             className="fable-heading proof__heading"
-            section="05"
+            section={id}
             lines={['Planos pelo', 'volume de projetos.']}
           />
         </div>
         <LineReveal
           as="p"
           className="fable-copy proof__lede"
-          section="05"
+          section={id}
           lines={[
             'Os dois planos têm a plataforma completa e a Automação.',
             'O que muda é quantos projetos você automatiza por mês.',

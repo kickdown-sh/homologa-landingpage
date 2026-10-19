@@ -37,8 +37,8 @@ function presenceForStep(presence: number, index: number) {
   return Math.max(0, Math.min(1, (presence - start) / (1 - (steps.length - 1) * STEP_STAGGER)));
 }
 
-export default function Mecanismo({ label }: SectionProps) {
-  const presence = useSectionPresence('03');
+export default function Mecanismo({ id }: SectionProps) {
+  const presence = useSectionPresence(id);
   const sectionStyle = {
     '--mechanism-presence': presence,
   } as CSSProperties;
@@ -301,7 +301,7 @@ export default function Mecanismo({ label }: SectionProps) {
             <LineReveal
               as="h2"
               className="fable-heading mechanism__heading"
-              section="03"
+              section={id}
               lines={['Cadastre uma vez.', <>O resto <span className="fable-accent">sai pronto.</span></>]}
             />
           </div>
@@ -310,13 +310,13 @@ export default function Mecanismo({ label }: SectionProps) {
             <LineReveal
               as="p"
               className="fable-copy"
-              section="03"
+              section={id}
               lines={['Os dados do projeto entram uma única vez. Dimensionamento, documentos, conferência normativa e acompanhamento do protocolo partem deles.']}
             />
             <LineReveal
               as="p"
               className="mechanism__spec"
-              section="03"
+              section={id}
               lines={['Inversor string  |  Microinversor']}
             />
           </div>
@@ -332,8 +332,8 @@ export default function Mecanismo({ label }: SectionProps) {
               <article className="mechanism__step" data-done={isDone} data-current={isCurrent} key={step.code} style={stepStyle}>
                 <span className="mechanism__node" aria-hidden="true" />
                 <span className="mechanism__num">{step.code}</span>
-                <LineReveal as="h3" className="mechanism__title" section="03" lines={[step.title]} />
-                <LineReveal as="p" className="mechanism__detail" section="03" lines={[step.detail]} />
+                <LineReveal as="h3" className="mechanism__title" section={id} lines={[step.title]} />
+                <LineReveal as="p" className="mechanism__detail" section={id} lines={[step.detail]} />
               </article>
             );
           })}
@@ -341,25 +341,25 @@ export default function Mecanismo({ label }: SectionProps) {
 
         <div className="mechanism__footer" data-scroll-anchor>
           <div className="mechanism__outputs">
-            <LineReveal as="p" className="mechanism__caption" section="03" lines={['Arquivos de saída']} />
+            <LineReveal as="p" className="mechanism__caption" section={id} lines={['Arquivos de saída']} />
             <div className="mechanism__formats" aria-label="Formatos de arquivo editáveis">
               {['PDF', 'SVG', 'DXF'].map((format) => (
-                <LineReveal as="span" className="mechanism__format" section="03" lines={[format]} key={format} />
+                <LineReveal as="span" className="mechanism__format" section={id} lines={[format]} key={format} />
               ))}
             </div>
             <LineReveal
               as="p"
               className="fable-copy"
-              section="03"
+              section={id}
               lines={['Editáveis, para o RT revisar e assinar sem redesenhar nada.']}
             />
           </div>
 
           <div className="mechanism__standards">
-            <LineReveal as="p" className="mechanism__caption" section="03" lines={['Normas conferidas']} />
+            <LineReveal as="p" className="mechanism__caption" section={id} lines={['Normas conferidas']} />
             <LineReveal
               as="p"
-              section="03"
+              section={id}
               lines={['NBR 5410, NBR 16690, PRODIST Módulo 3 e Lei 14.300.']}
             />
           </div>

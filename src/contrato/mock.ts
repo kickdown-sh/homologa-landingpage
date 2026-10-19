@@ -20,10 +20,10 @@ const frames: MockTelemetry[] = [
 export function useMockTelemetry(): MockTelemetry {
   const [frame, setFrame] = useState(0);
 
-  // Só anima com a seção 02 na tela: fora dela o intervalo re-renderizava a
+  // Só anima com a seção 03 (documentos) na tela: fora dela o intervalo re-renderizava a
   // seção inteira a cada 400ms durante toda a visita.
   useEffect(() => {
-    const section = document.querySelector<HTMLElement>('[data-section="02"]');
+    const section = document.querySelector<HTMLElement>('[data-section="03"]');
     let timer = 0;
     const start = () => {
       if (!timer) timer = window.setInterval(() => setFrame((value) => (value + 1) % frames.length), 400);

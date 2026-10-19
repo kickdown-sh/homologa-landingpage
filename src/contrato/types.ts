@@ -1,6 +1,6 @@
 import type { ComponentType } from 'react';
 
-export type SectionId = '01' | '02' | '03' | '04' | '05' | '06';
+export type SectionId = '01' | '02' | '03' | '04' | '05' | '06' | '07';
 
 export type SectionProps = {
   id: SectionId;
